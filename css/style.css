@@ -1,0 +1,110 @@
+/* Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Header Styles */
+  h1 {
+    text-align: center;
+    font-size: 3rem;
+    color: #333;
+    margin: 2rem 0;
+  }
+  
+  .piggybank {
+    margin: auto;
+    max-width: 1024px;
+  }
+
+  /* Form Styles */
+  form {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    margin-bottom: 1rem;
+  }
+  
+  label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  input {
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 3px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    width: 125px;
+  }
+  
+  button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin: 6px;
+    border-radius: 3px;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #666;
+  }
+  
+  /* Table Styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+  }
+  
+  thead {
+    background-color: #333;
+    color: #fff;
+  }
+  
+  th, td {
+    text-align: center;
+    padding: 0.5rem;
+  }
+  
+  th:first-child, td:first-child {
+    text-align: left;
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  /* Save Results Button Styles */
+  .save-results {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .save-results button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 3px;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  
+  .save-results button:hover {
+    background-color: #666;
+  }
