@@ -5,7 +5,10 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 	<script src="script/chart.min.js"></script>
+  <script src="script/rr.js"></script>
 	<script src="script/chartjs-plugin-zoom.min.js"  type="module"></script>
+  <script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
+
 </head>
 <body>
   <h1>Rocket ripae</h1>
@@ -56,7 +59,7 @@
   <div class="canvas"><canvas id="piggybank-chart"></canvas></div>
 </div>
   <script>
-    let piggybank = {};
+    let piggybank = [];
     
     // Load the piggy bank from the JSON file
     fetch("/data/piggybank.json")
@@ -70,49 +73,57 @@
         console.log(error);
       });
     
-    function addProduct() {
+      function addProduct() {
   let productName = document.getElementById("product-name").value;
   let targetAmount = parseInt(document.getElementById("target-amount").value);
   let targetDate = new Date(document.getElementById("target-date").value);
   if (productName && targetAmount && targetDate) {
-    piggybank[productName] = {
+    piggybank.push({
+      name: productName,
       amount: 0,
       target: targetAmount,
       targetDate: targetDate
-    };
+    });
     document.getElementById("product-name").value = "";
     document.getElementById("target-amount").value = "";
     document.getElementById("target-date").value = "";
     displayPiggybank();
-  }
-}
+  }};
     
-    function removeProduct(item) {
-      delete piggybank[item];
-      displayPiggybank();
-    }
+function removeProduct(item) {
+  piggybank.splice(item, 1);
+  displayPiggybank();
+};
+
     
-    function saveResults() {
-  // Use local storage to save the results
-  localStorage.setItem("piggybank", JSON.stringify(piggybank));
+function saveResults() {
+  try {
+    // Use local storage to save the results
+    localStorage.setItem("piggybank", JSON.stringify(piggybank));
 
-  // Create a Blob containing the JSON data
-  const json = JSON.stringify(piggybank);
-  const blob = new Blob([json], {type: "application/json"});
+    // Create a Blob containing the JSON data
+    const json = JSON.stringify(piggybank);
+    const blob = new Blob([json], {type: "application/json"});
 
-  // Create a link to download the Blob
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "piggybank.json";
+    // Create a link to download the Blob
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "piggybank.json";
 
-  // Click the link to download the Blob
-  document.body.appendChild(a);
-  a.click();
+    // Click the link to download the Blob
+    document.body.appendChild(a);
+    a.click();
 
-  // Clean up the URL object
-  URL.revokeObjectURL(url);
-}
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+
+    // Return a success message
+    alert("Piggy bank data saved successfully!");
+  } catch (error) {
+    console.error("Error saving piggy bank data:", error);
+    alert("An error occurred while saving piggy bank data. Please try again later.");
+  }};
 
 function changeTargetDate(item, value) {
   let newDate = new Date(value);
@@ -120,18 +131,15 @@ function changeTargetDate(item, value) {
     piggybank[item].targetDate = newDate;
     displayPiggybank();
   }
-  else {
-    alert("Invalid date");
-  }
+  else {alert("Invalid date");}
   document.getElementById("target-date-" + item).value = newDate.toISOString().slice(0,10);
 }
 
 
 function changeAmount(item, amount) {
   const newAmount = parseInt(amount);
-  if (isNaN(newAmount)) {
-    alert("Please enter a valid amount");
-  } else {
+  if (isNaN(newAmount)) {alert("Please enter a valid amount");} 
+  else {
     piggybank[item].amount = newAmount;
     displayPiggybank();
     displayChart();
@@ -158,7 +166,6 @@ function displayPiggybank() {
   let totalAmountSaved = 0;
   let totalTargetAmount = 0;
   let totalMonthlySavings = 0;
- 
 
   for (let item in piggybank) {
     // Calculate the difference between the target date and the current date in months
@@ -170,21 +177,35 @@ function displayPiggybank() {
     totalAmountSaved += piggybank[item].amount;
     totalTargetAmount += piggybank[item].target;
     totalMonthlySavings += monthlySavings;
-    
-    tableData += "<tr><td>" + item + "</td><td><input type='text' id='amount-" + item + "' value='" + piggybank[item].amount + "'></td><td><input type='text' id='target-amount-" + item + "' value='" + piggybank[item].target + "'></td><td>" + new Date(piggybank[item].targetDate).toLocaleDateString('en-GB', {
+
+    const moveUpBtn = "<button onclick=\"moveUp('" + item + "')\" title=\"Move Up\"><span class=\"iconify\" data-icon=\"material-symbols:arrow-circle-up-outline-rounded\"></span></button>";
+    const changeBtn = "<button onclick=\"changeAmountAndTarget('" + item + "', document.getElementById('amount-" + item + "').value, document.getElementById('target-amount-" + item + "').value)\" title=\"Change the value\"><span class='iconify' data-icon='mdi:refresh-circle'></span><span class='currency-symbol'> €</span></button>";
+    const removeBtn = "<button onclick=\"removeProduct('" + item + "')\"><span class=\"iconify\" data-icon=\"mdi:alpha-x-circle-outline\" title=\"remove this product\"></span></button>"
+
+    tableData += "<tr id='" + item + "'><td>" + piggybank[item].name + "</td><td><input type='text' id='amount-" + item + "' value='" + piggybank[item].amount + "'></td><td><input type='text' id='target-amount-" + item + "' value='" + piggybank[item].target + "'></td><td>" + new Date(piggybank[item].targetDate).toLocaleDateString('en-GB', {
       timeZone: "UTC",
       weekday: "long",
       year: "numeric",
       month: "short",
       day: "numeric",
-    }) + "</td><td>" + monthsToTarget + "</td><td>" + monthlySavings + "</td><td><button onclick=\"changeAmountAndTarget('" + item + "', document.getElementById('amount-" + item + "').value, document.getElementById('target-amount-" + item + "').value)\"><span class='currency-symbol'>€ </span>Change</button> <input type='date' id='target-date' onchange=\"changeTargetDate('" + item + "', this.value)\"> <button onclick=\"removeProduct('" + item + "')\">Remove</button></td></tr>";
+    }) + "</td><td>" + monthsToTarget + "</td><td>" + monthlySavings + "</td><td>" + moveUpBtn + changeBtn + removeBtn + "<input type='date' id='target-date' onchange=\"changeTargetDate('" + item + "', this.value)\"></td></tr>";
   }
-  
+
   // Add the footer row
-  const footerRow = "<tr><td><strong>Total</strong></td><td><strong>" + totalAmountSaved + "</strong></td><td><strong>" + totalTargetAmount + "</strong></td><td></td><td></td><td><strong>" + totalMonthlySavings + "</strong></td><td></td></tr>";
-  
+  const footerRow = "<tr><td><strong>Total</strong></td><td><strong><span class='currency-symbol'>€ </span>" + totalAmountSaved + "</strong></td><td><strong><span class='currency-symbol'>€ </span>" + totalTargetAmount + "</strong></td><td></td><td></td><td><strong><span class='currency-symbol'>€ </span>" + totalMonthlySavings + "</strong></td><td></td></tr>";
+
   document.getElementById("piggybank-table").innerHTML = "<thead><tr><th>Product</th><th>Amount Saved<span class='currency-symbol'> €</span></th><th>Target Amount<span class='currency-symbol'> €</span></th><th>Target Date</th><th>Months to Target</th><th>Monthly Savings<span class='currency-symbol'> €</span></th><th>Action</th></tr></thead><tbody>" + tableData + "</tbody><tfoot>" + footerRow + "</tfoot>";
-}
+};
+
+
+function moveUp(item) {
+  if (item > 0) {
+    const temp = piggybank[item];
+    piggybank[item] = piggybank[item - 1];
+    piggybank[item - 1] = temp;
+    displayPiggybank();
+  }};
+
 
 // Display the piggy bank when the page loads
 displayPiggybank();
@@ -194,6 +215,7 @@ document.getElementById("add-product").addEventListener("click", addProduct);
 document.getElementById("save-results").addEventListener("click", saveResults);
  
 function changeCurrency() {
+  
   const currencySelector = document.getElementById('currency-selector');
   const currencySymbolElements = document.querySelectorAll('.currency-symbol');
 
@@ -215,12 +237,12 @@ function changeCurrency() {
     const currencySymbol = currencySymbols[currency];
     currencySymbolElements[i].textContent = currencySymbol;
   }
-}
+};
 
 
 function displayChart() {
   const ctx = document.getElementById('piggybank-chart').getContext('2d');
-  const labels = Object.keys(piggybank);
+  const labels = Object.values(piggybank).map(item => item.name);
   const data = Object.values(piggybank).map(item => item.amount);
   const data2 = Object.values(piggybank).map(item => item.target);
   const chart = new Chart(ctx, {
@@ -272,13 +294,17 @@ function displayChart() {
     },
     options: {
       scales: {
-        y: {beginAtZero: true}
+        y: {beginAtZero: true,
+          ticks: {
+        color: '#ACACAC'
+      }},
+      x: {ticks: {
+        color: '#ACACAC'
+      }}
       },
       plugins: {
         zoom: {
-
-          zoom: {
-            wheel: {
+          zoom: {wheel: {
               enabled: true,
               mode: "y"
             },
@@ -293,7 +319,8 @@ function displayChart() {
           limits: {
                   y: {min: 0, max: 35000}
                 }
-        }}}});};
+        },
+      }}});};
 
  </script>
 </body>

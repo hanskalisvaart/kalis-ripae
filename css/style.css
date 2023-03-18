@@ -103,7 +103,9 @@ td {
   -webkit-box-shadow: 0 2px 2px -2px #0E1119;
   -moz-box-shadow: 0 2px 2px -2px #0E1119;
   box-shadow: 0 2px 2px -2px #0E1119;
-  padding: 1em;
+  padding: 0px 8px;
+  font-weight: bold;
+  color: #ACACAC;
 }
 
 td:first-child {
@@ -133,6 +135,13 @@ tfoot td {
 tfoot td:first-child {
   text-align: left;
   color: #2896c9;
+}
+
+tfoot td:hover {
+  background-color: #1F2739;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  color: #fff;
+  transform: translate3d(0px, 0px, 0);
 }
 
 tbody tr:hover {
