@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Digital Piggy Bank</title>
+  <title>Rocket-ripae </title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+	<script src="script/chart.min.js"></script>
+	<script src="script/chartjs-plugin-zoom.min.js"  type="module"></script>
 </head>
 <body>
-  <h1>Digital Piggy Bank</h1>
-  <div class="piggybank">
+  <h1>Rocket ripae</h1>
+    <div class="piggybank">
   <div>
     <label for="product-name">Product Name:</label>
     <input type="text" id="product-name">
@@ -51,6 +53,7 @@
       <option value="NZD">NZD</option>
     </select>
   </div>
+  <div class="canvas"><canvas id="piggybank-chart"></canvas></div>
 </div>
   <script>
     let piggybank = {};
@@ -61,6 +64,7 @@
       .then(data => {
         piggybank = data;
         displayPiggybank();
+        displayChart();
       })
       .catch(error => {
         console.log(error);
@@ -130,6 +134,7 @@ function changeAmount(item, amount) {
   } else {
     piggybank[item].amount = newAmount;
     displayPiggybank();
+    displayChart();
   }
   document.getElementById("amount-" + item).value = piggybank[item].amount;
 }
@@ -172,7 +177,7 @@ function displayPiggybank() {
       year: "numeric",
       month: "short",
       day: "numeric",
-    }) + "</td><td>" + monthsToTarget + "</td><td>" + monthlySavings + "</td><td><button onclick=\"changeAmountAndTarget('" + item + "', document.getElementById('amount-" + item + "').value, document.getElementById('target-amount-" + item + "').value)\">Change<span class='currency-symbol'> €</span></button> <input type='date' id='target-date' onchange=\"changeTargetDate('" + item + "', this.value)\"> <button onclick=\"removeProduct('" + item + "')\">Remove</button></td></tr>";
+    }) + "</td><td>" + monthsToTarget + "</td><td>" + monthlySavings + "</td><td><button onclick=\"changeAmountAndTarget('" + item + "', document.getElementById('amount-" + item + "').value, document.getElementById('target-amount-" + item + "').value)\"><span class='currency-symbol'>€ </span>Change</button> <input type='date' id='target-date' onchange=\"changeTargetDate('" + item + "', this.value)\"> <button onclick=\"removeProduct('" + item + "')\">Remove</button></td></tr>";
   }
   
   // Add the footer row
@@ -211,6 +216,84 @@ function changeCurrency() {
     currencySymbolElements[i].textContent = currencySymbol;
   }
 }
+
+
+function displayChart() {
+  const ctx = document.getElementById('piggybank-chart').getContext('2d');
+  const labels = Object.keys(piggybank);
+  const data = Object.values(piggybank).map(item => item.amount);
+  const data2 = Object.values(piggybank).map(item => item.target);
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Amount Saved',
+        data: data,
+        backgroundColor: 
+        ['rgba(255, 0, 0, 0.4)',
+        'rgba(255, 165, 0, 0.4)',
+        'rgba(255, 255, 0, 0.4)',
+        'rgba(0, 128, 0, 0.4)',
+        'rgba(0, 0, 255, 0.4)',
+        'rgba(75, 0, 130, 0.4)',
+        'rgba(238, 130, 238, 0.4)'],
+        borderColor: 
+        ['rgba(255, 0, 0, 1)',
+        'rgba(255, 165, 0, 1)',
+        'rgba(255, 255, 0, 1)',
+        'rgba(0, 128, 0, 1)',
+        'rgba(0, 0, 255, 1)',
+        'rgba(75, 0, 130, 1)',
+        'rgba(238, 130, 238, 1)'],
+        borderWidth: 1
+      },
+      {
+        label: 'Target Amount',
+        data: data2,
+        backgroundColor: 
+        ['rgba(255, 0, 0, 0.4)',
+        'rgba(255, 165, 0, 0.4)',
+        'rgba(255, 255, 0, 0.4)',
+        'rgba(0, 128, 0, 0.4)',
+        'rgba(0, 0, 255, 0.4)',
+        'rgba(75, 0, 130, 0.4)',
+        'rgba(238, 130, 238, 0.4)'],
+        borderColor: 
+        ['rgba(255, 0, 0, 1)',
+        'rgba(255, 165, 0, 1)',
+        'rgba(255, 255, 0, 1)',
+        'rgba(0, 128, 0, 1)',
+        'rgba(0, 0, 255, 1)',
+        'rgba(75, 0, 130, 1)',
+        'rgba(238, 130, 238, 1)'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {beginAtZero: true}
+      },
+      plugins: {
+        zoom: {
+
+          zoom: {
+            wheel: {
+              enabled: true,
+              mode: "y"
+            },
+            pinch: {
+              enabled: true
+            },
+            mode: 'y',
+            drag: {
+              enabled: true,
+            },
+          },
+          limits: {
+                  y: {min: 0, max: 35000}
+                }
+        }}}});};
 
  </script>
 </body>
