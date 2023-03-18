@@ -1,7 +1,7 @@
 /* Body Styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
+    background-color: #2C3446;
     margin: 0;
     padding: 0;
   }
@@ -10,7 +10,7 @@ body {
   h1 {
     text-align: center;
     font-size: 3rem;
-    color: #333;
+    color: #2896c9;
     margin: 2rem 0;
   }
   
@@ -35,7 +35,7 @@ body {
   label {
     font-size: 1.2rem;
     font-weight: bold;
-    color: #333;
+    color: #2896c9;
   }
   
   input {
@@ -44,50 +44,116 @@ body {
     border: none;
     border-radius: 3px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-    width: 125px;
+    width: 100px;
   }
   
   button {
-    background-color: #333;
+    background-color: #833;
     color: #fff;
     border: none;
-    padding: 0.5rem 1rem;
-    margin: 6px;
+    padding: 0px 8px;
+    margin: 1px;
     border-radius: 3px;
     font-size: 1.2rem;
     cursor: pointer;
   }
   
   button:hover {
-    background-color: #666;
+    background-color: #411;
+  }
+
+  .canvas {
+    background-color: #323C50;
+    -webkit-box-shadow: 0 2px 2px -2px #0E1119;
+    -moz-box-shadow: 0 2px 2px -2px #0E1119;
+    box-shadow: 0 2px 2px -2px #0E1119;
+    margin: 25px auto;
   }
   
-  /* Table Styles */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-  }
+/* Table Styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  margin: 25px auto;
+}
+
+thead {
+  background-color: #1F2739;
+  color: #fff;
+}
+
+th {
+  font-weight: bold;
+  font-size: 1em;
+  text-align: left;
+  color: #2896c9;
+  padding: 1em;
+}
+
+th:first-child {
+  text-align: left;
+}
+
+td {
+  font-weight: normal;
+  font-size: 1em;
+  -webkit-box-shadow: 0 2px 2px -2px #0E1119;
+  -moz-box-shadow: 0 2px 2px -2px #0E1119;
+  box-shadow: 0 2px 2px -2px #0E1119;
+  padding: 1em;
+}
+
+td:first-child {
+  color: #ffa600;
+}
+
+/* Background-color of the odd rows */
+tbody tr:nth-child(odd) {
+  background-color: #2C3446;
+}
+
+/* Background-color of the even rows */
+tbody tr:nth-child(even) {
+  background-color: #323C50;
+}
+
+tfoot {
+  background-color: #1F2739;
+  color: #fff;
+}
+
+tfoot td {
+  padding: 1em;
+  text-align: center;
+}
+
+tfoot td:first-child {
+  text-align: left;
+  color: #2896c9;
+}
+
+tbody tr:hover {
+  background-color: #464A52;
+  -webkit-box-shadow: 0 6px 6px -6px #0E1119;
+  -moz-box-shadow: 0 6px 6px -6px #0E1119;
+  box-shadow: 0 6px 6px -6px #0E1119;
+}
+
+td:hover {
+  background-color: #ffa600;
+  color: #403E10;
+  font-weight: bold;
+  box-shadow: #7f5921 -1px 1px, #7f5921 -2px 2px, #7f5921 -3px 3px, #7f5921 -4px 4px, #7f5921 -5px 5px, #7f5921 -6px 6px;
+  transform: translate3d(3px, -3px, 0);
+  transition-delay: 0s;
+  transition-duration: 0.8s;
+  transition-property: all;
+  transition-timing-function: line;
+}
   
-  thead {
-    background-color: #333;
-    color: #fff;
-  }
-  
-  th, td {
-    text-align: center;
-    padding: 0.5rem;
-  }
-  
-  th:first-child, td:first-child {
-    text-align: left;
-  }
-  
-  tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
   
   /* Save Results Button Styles */
   .save-results {
