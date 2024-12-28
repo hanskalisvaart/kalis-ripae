@@ -54,6 +54,21 @@
           <option value="NZD">NZD</option>
         </select>
       </div>
+      <select
+        id="chartType"
+        onchange="switchChartView(document.getElementById('dataType').value, this.value)"
+      >
+        <option value="bar">Bar Chart</option>
+        <option value="line">Line Chart</option>
+      </select>
+
+      <select
+        id="dataType"
+        onchange="switchChartView(this.value, document.getElementById('chartType').value)"
+      >
+        <option value="savings">Savings</option>
+        <!-- Add other data type options as needed -->
+      </select>
       <div class="canvas"><canvas id="piggybank-chart"></canvas></div>
     </div>
     <script src="script/script.js"></script>
