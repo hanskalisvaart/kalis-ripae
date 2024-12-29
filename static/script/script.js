@@ -434,54 +434,7 @@ function getChartData(dataType) {
           },
         ],
       };
-    case "history":
-      // Get all unique dates from all items' histories
-      const dates = [
-        ...new Set(
-          piggybank.flatMap((item) =>
-            item.history ? item.history.map((h) => h.date) : []
-          )
-        ),
-      ].sort();
-
-      // Create datasets for total amounts and targets
-      const totalAmounts = dates.map((date) => {
-        return piggybank.reduce((sum, item) => {
-          const historyEntry = item.history
-            ? item.history.find((h) => h.date === date)
-            : null;
-          return sum + (historyEntry ? historyEntry.amount : 0);
-        }, 0);
-      });
-
-      const totalTargets = dates.map((date) => {
-        return piggybank.reduce((sum, item) => {
-          const historyEntry = item.history
-            ? item.history.find((h) => h.date === date)
-            : null;
-          return sum + (historyEntry ? historyEntry.target : 0);
-        }, 0);
-      });
-
-      return {
-        labels: dates,
-        datasets: [
-          {
-            label: "Total Amount Saved",
-            data: totalAmounts,
-            borderColor: "rgb(75, 192, 192)",
-            tension: 0.1,
-            fill: false,
-          },
-          {
-            label: "Total Target Amount",
-            data: totalTargets,
-            borderColor: "rgb(255, 99, 132)",
-            tension: 0.1,
-            fill: false,
-          },
-        ],
-      };
+    // Add other data type cases as needed
     default:
       return null;
   }
@@ -489,20 +442,23 @@ function getChartData(dataType) {
 
 function displayChart(dataType = "savings", chartType = "bar") {
   const ctx = document.getElementById("piggybank-chart").getContext("2d");
+
   const chartData = getChartData(dataType);
   if (!chartData) return;
 
-  const options =
-    dataType === "history" ? HISTORY_CHART_OPTIONS : CHART_OPTIONS;
-
   if (chart) {
-    chart.destroy();
+    // Update existing chart
+    chart.data = chartData;
+    chart.config.type = chartType;
+    chart.update("none");
+    return;
   }
 
+  // Create new chart if it doesn't exist
   chart = new Chart(ctx, {
     type: chartType,
     data: chartData,
-    options: options,
+    options: CHART_OPTIONS,
   });
 }
 

@@ -12,22 +12,13 @@ import (
 )
 
 // PiggyBankItem represents a single item in the piggy bank
-// PiggyBankItem represents a single item in the piggy bank
 type PiggyBankItem struct {
-    Name           string    `json:"name"`
-    Amount         float64   `json:"amount"`
-    Target         float64   `json:"target"`
-    TargetDate     string    `json:"targetDate"`
-    MonthsToTarget int       `json:"monthsToTarget"`
-    MonthlySavings float64   `json:"monthlySavings"`
-    History        []Monthly `json:"history"`
-}
-
-// Monthly tracks the amounts for a specific month
-type Monthly struct {
-    Date   string  `json:"date"`
-    Amount float64 `json:"amount"`
-    Target float64 `json:"target"`
+    Name           string  `json:"name"`
+    Amount         float64 `json:"amount"`
+    Target         float64 `json:"target"`
+    TargetDate     string  `json:"targetDate"`
+    MonthsToTarget int     `json:"monthsToTarget"`
+    MonthlySavings float64 `json:"monthlySavings"`
 }
 
 func main() {
@@ -103,38 +94,6 @@ func handleSave(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Get current date in YYYY-MM format
-    currentDate := time.Now().Format("2006-01")
-
-    // Update history for each item
-    for i := range items {
-        // Initialize history if it doesn't exist
-        if items[i].History == nil {
-            items[i].History = []Monthly{}
-        }
-
-        // Check if we already have an entry for current month
-        found := false
-        for j := range items[i].History {
-            if items[i].History[j].Date == currentDate {
-                // Update existing entry
-                items[i].History[j].Amount = items[i].Amount
-                items[i].History[j].Target = items[i].Target
-                found = true
-                break
-            }
-        }
-
-        // Add new entry if not found
-        if !found {
-            items[i].History = append(items[i].History, Monthly{
-                Date:   currentDate,
-                Amount: items[i].Amount,
-                Target: items[i].Target,
-            })
-        }
-    }
-
     // Ensure data directory exists
     err = os.MkdirAll("data", 0755)
     if err != nil {
@@ -152,7 +111,7 @@ func handleSave(w http.ResponseWriter, r *http.Request) {
     defer file.Close()
 
     encoder := json.NewEncoder(file)
-    encoder.SetIndent("", " ")
+    encoder.SetIndent("", "  ")
     err = encoder.Encode(items)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
