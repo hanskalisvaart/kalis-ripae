@@ -14,6 +14,7 @@ fetch("/data/piggybank.json")
       calculateMonthsToTargetAndMonthlySavings(index);
     });
     displayPiggybank();
+    updateDataTypeOptions();
     displayChart();
   })
   .catch((error) => {
@@ -24,6 +25,7 @@ fetch("/data/piggybank.json")
       calculateMonthsToTargetAndMonthlySavings(index);
     });
     displayPiggybank();
+    updateDataTypeOptions();
     displayChart();
   });
 
@@ -56,6 +58,7 @@ function addProduct() {
     document.getElementById("target-amount").value = "";
     document.getElementById("target-date").value = "";
     displayPiggybank();
+    updateDataTypeOptions();
     displayChart();
   }
 }
@@ -65,6 +68,7 @@ function removeProduct(index) {
   if (confirmation) {
     piggybank.splice(index, 1);
     displayPiggybank();
+    updateDataTypeOptions();
     displayChart();
   }
 }
@@ -110,6 +114,7 @@ function changeTargetDate(item, value) {
     piggybank[item].targetDate = newDate;
     calculateMonthsToTargetAndMonthlySavings(item);
     displayPiggybank();
+    updateDataTypeOptions();
     displayChart();
   } else {
     alert("Invalid date");
@@ -125,6 +130,7 @@ function changeAmountAndTarget(item, amount, targetAmount) {
     piggybank[item].target = newTargetAmount;
     calculateMonthsToTargetAndMonthlySavings(item);
     displayPiggybank();
+    updateDataTypeOptions();
     displayChart();
   }
   document.getElementById("amount-" + item).value = piggybank[item].amount;
@@ -230,6 +236,7 @@ function moveUp(item) {
       piggybank[item] = piggybank[item - 1];
       piggybank[item - 1] = temp;
       displayPiggybank();
+      updateDataTypeOptions();
       displayChart();
     }
   };
@@ -241,6 +248,7 @@ function moveDown(event) {
     piggybank[item] = piggybank[item + 1];
     piggybank[item + 1] = temp;
     displayPiggybank();
+    updateDataTypeOptions();
     displayChart();
   }
 }
@@ -440,7 +448,6 @@ function getChartData(dataType) {
         ],
       };
     case "history":
-      // Get all unique dates from all items' histories
       const dates = [
         ...new Set(
           piggybank.flatMap((item) =>
@@ -477,6 +484,41 @@ function getChartData(dataType) {
         ]),
       };
     default:
+      // Handle individual goal history
+      if (dataType.startsWith("goal_")) {
+        const goalName = dataType.replace("goal_", "");
+        const goal = piggybank.find((item) => item.name === goalName);
+
+        if (!goal || !goal.history) return null;
+
+        const dates = goal.history.map((h) => h.date).sort();
+        return {
+          labels: dates,
+          datasets: [
+            {
+              label: `${goal.name} - Amount`,
+              data: dates.map((date) => {
+                const historyEntry = goal.history.find((h) => h.date === date);
+                return historyEntry ? historyEntry.amount : null;
+              }),
+              borderColor: CHART_COLORS.borderColor[0],
+              backgroundColor: CHART_COLORS.backgroundColor[0],
+              fill: false,
+            },
+            {
+              label: `${goal.name} - Target`,
+              data: dates.map((date) => {
+                const historyEntry = goal.history.find((h) => h.date === date);
+                return historyEntry ? historyEntry.target : null;
+              }),
+              borderColor: CHART_COLORS.borderColor[0],
+              backgroundColor: "transparent",
+              borderDash: [5, 5],
+              fill: false,
+            },
+          ],
+        };
+      }
       return null;
   }
 }
@@ -506,4 +548,27 @@ function displayChart(dataType = "savings", chartType = "bar") {
 // Add a function to switch data/chart type
 function switchChartView(dataType, chartType) {
   displayChart(dataType, chartType);
+}
+
+// Function to update data type options
+function updateDataTypeOptions() {
+  const dataTypeSelect = document.getElementById("dataType");
+  const currentValue = dataTypeSelect.value;
+
+  // Clear existing options
+  dataTypeSelect.innerHTML = "";
+
+  // Add default options
+  dataTypeSelect.add(new Option("Savings", "savings"));
+  dataTypeSelect.add(new Option("All Goals History", "history"));
+
+  // Add individual goals
+  piggybank.forEach((item) => {
+    dataTypeSelect.add(new Option(`${item.name}`, `goal_${item.name}`));
+  });
+
+  // Try to restore previous selection
+  if (dataTypeSelect.querySelector(`option[value="${currentValue}"]`)) {
+    dataTypeSelect.value = currentValue;
+  }
 }
