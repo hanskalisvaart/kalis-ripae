@@ -434,7 +434,43 @@ function getChartData(dataType) {
           },
         ],
       };
-    // Add other data type cases as needed
+    case "history":
+      // Get all unique dates from all items' histories
+      const dates = [
+        ...new Set(
+          piggybank.flatMap((item) =>
+            item.history ? item.history.map((h) => h.date) : []
+          )
+        ),
+      ].sort();
+
+      return {
+        labels: dates,
+        datasets: piggybank.flatMap((item) => [
+          {
+            label: `${item.name} - Amount`,
+            data: dates.map((date) => {
+              const historyEntry = item.history?.find((h) => h.date === date);
+              return historyEntry ? historyEntry.amount : null;
+            }),
+            borderColor: CHART_COLORS.borderColor[piggybank.indexOf(item)],
+            backgroundColor:
+              CHART_COLORS.backgroundColor[piggybank.indexOf(item)],
+            fill: false,
+          },
+          {
+            label: `${item.name} - Target`,
+            data: dates.map((date) => {
+              const historyEntry = item.history?.find((h) => h.date === date);
+              return historyEntry ? historyEntry.target : null;
+            }),
+            borderColor: CHART_COLORS.borderColor[piggybank.indexOf(item)],
+            backgroundColor: "transparent",
+            borderDash: [5, 5],
+            fill: false,
+          },
+        ]),
+      };
     default:
       return null;
   }
