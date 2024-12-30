@@ -40,6 +40,7 @@
 
       <div>
         <button id="save-results">Save Results</button>
+        <button id="backup-data">Backup</button>
         <select id="currency-selector" onchange="changeCurrency()">
           <option value="EUR">EUR</option>
           <option value="USD">USD</option>
@@ -52,23 +53,23 @@
           <option value="HKD">HKD</option>
           <option value="NZD">NZD</option>
         </select>
-      </div>
-      <select
-        id="chartType"
-        onchange="switchChartView(document.getElementById('dataType').value, this.value)"
-      >
-        <option value="bar">Bar Chart</option>
-        <option value="line">Line Chart</option>
-      </select>
+        <select
+          id="chartType"
+          onchange="switchChartView(document.getElementById('dataType').value, this.value)"
+        >
+          <option value="bar">Bar Chart</option>
+          <option value="line">Line Chart</option>
+        </select>
 
-      <select
-        id="dataType"
-        onchange="switchChartView(this.value, document.getElementById('chartType').value)"
-      >
-        <option value="savings">Savings</option>
-        <option value="history">Historical View</option>
-        <!-- Add other data type options as needed -->
-      </select>
+        <select
+          id="dataType"
+          onchange="switchChartView(this.value, document.getElementById('chartType').value)"
+        >
+          <option value="savings">Savings</option>
+          <option value="history">Historical View</option>
+          <!-- Add other data type options as needed -->
+        </select>
+      </div>
       <div class="canvas"><canvas id="piggybank-chart"></canvas></div>
     </div>
     <script src="script/script.js"></script>

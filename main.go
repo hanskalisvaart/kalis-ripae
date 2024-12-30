@@ -45,6 +45,7 @@ func main() {
     // Handle data endpoints
     http.HandleFunc("/data/piggybank.json", handleData)
     http.HandleFunc("/api/save", handleSave)
+    http.HandleFunc("/api/backup", handleBackup)
 
     // Start server
     fmt.Println("Server starting on http://localhost:8080")
@@ -158,6 +159,32 @@ func handleSave(w http.ResponseWriter, r *http.Request) {
 
     w.WriteHeader(http.StatusOK)
 }
+
+// Backup function
+func handleBackup(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodGet {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
+
+    dataFile := filepath.Join("data", "piggybank.json")
+    file, err := os.Open(dataFile)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    defer file.Close()
+
+    filename := fmt.Sprintf("piggybank_backup_%s.json", 
+        time.Now().Format("2006-01-02_150405"))
+    
+    w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Content-Disposition", 
+        fmt.Sprintf("attachment; filename=%s", filename))
+    
+    io.Copy(w, file)
+}
+
 
 func loadExistingData() ([]PiggyBankItem, error) {
     dataFile := filepath.Join("data", "piggybank.json")

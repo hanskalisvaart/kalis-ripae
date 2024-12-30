@@ -99,6 +99,11 @@ function saveResults() {
   }
 }
 
+//backup
+document.getElementById("backup-data").addEventListener("click", function () {
+  window.location.href = "/api/backup";
+});
+
 function changeTargetDate(item, value) {
   let newDate = new Date(value);
   if (newDate) {
