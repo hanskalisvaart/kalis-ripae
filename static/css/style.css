@@ -64,9 +64,8 @@ button:hover {
 
 .canvas {
   background-color: #323c50;
-  -webkit-box-shadow: 0 2px 2px -2px #0e1119;
-  -moz-box-shadow: 0 2px 2px -2px #0e1119;
-  box-shadow: 0 2px 2px -2px #0e1119;
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   margin: 25px auto;
 }
 
