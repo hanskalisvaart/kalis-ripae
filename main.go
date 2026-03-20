@@ -48,8 +48,8 @@ func main() {
     http.HandleFunc("/api/backup", handleBackup)
 
     // Start server
-    fmt.Println("Server starting on http://localhost:8080")
-    log.Fatal(http.ListenAndServe(":8080", nil))
+    fmt.Println("Server starting on http://localhost:8081")
+    log.Fatal(http.ListenAndServe(":8081", nil))
 }
 
 func handleHome(w http.ResponseWriter, r *http.Request) {

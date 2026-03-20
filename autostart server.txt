@@ -1,0 +1,55 @@
+Create a Service File:
+
+You'll need to create a new service file. Open a terminal and use a text editor like nano to create a new file in the /etc/systemd/system directory. For example:
+sudo nano /etc/systemd/system/kalis-ripae.service
+
+Define the Service:
+
+Add the following content to your service file:
+
+[Unit]
+Description=Run Kalis Ripae on startup
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/kalis-ripae
+ExecStart=/opt/kalis-ripae/kalis-ripae
+Restart=always
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+
+
+Replace <your-username> and <your-group> with your actual username and group.
+
+Reload systemd:
+
+After saving the file, you'll need to reload the systemd manager configuration:
+sudo systemctl daemon-reload
+
+Enable the Service:
+
+Enable the service to start on boot:
+sudo systemctl enable kalis-ripae
+
+Finally, start the service:
+sudo systemctl start kalis-ripae
+
+Now, your script should run automatically on startup! If you need to check the status of your service to make sure everything is working fine, you can use:
+sudo systemctl status kalis-ripae
+
+
+*** update files on server ***
+
+go build -o kalis-ripae
+
+the transfer kalis-ripae to server and copy static folder to server
+
+test by doing:
+
+bashsudo systemctl restart kalis-ripae
+
+# Check it came back up cleanly
+sudo systemctl status kalis-ripae

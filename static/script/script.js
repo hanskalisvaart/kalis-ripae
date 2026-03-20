@@ -1,5 +1,6 @@
-let piggybank = []; // Initialize an empty array
+let piggybank = [];
 let currentItem = 0;
+let selectedCurrency = "EUR"; // Persist currency selection
 
 fetch("/data/piggybank.json")
   .then((response) => {
@@ -18,7 +19,6 @@ fetch("/data/piggybank.json")
     displayChart();
   })
   .catch((error) => {
-    // Handle the error, and use default data if the file is not found
     console.log(error);
     piggybank = getDefaultData();
     piggybank.forEach((item, index) => {
@@ -30,29 +30,34 @@ fetch("/data/piggybank.json")
   });
 
 function getDefaultData() {
-  // Define default data
+  // Use dates relative to today so months-to-target is never immediately negative
+  const future = (monthsAhead) => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + monthsAhead);
+    return d.toISOString().split("T")[0];
+  };
   return [
-    { name: "product1", amount: 0, target: 100, targetDate: "2024-01-01" },
-    { name: "product2", amount: 0, target: 150, targetDate: "2024-02-01" },
-    { name: "product3", amount: 0, target: 200, targetDate: "2024-03-01" },
-    { name: "product4", amount: 0, target: 250, targetDate: "2024-04-01" },
-    { name: "product5", amount: 0, target: 300, targetDate: "2024-05-01" },
+    { name: "product1", amount: 0, target: 100, targetDate: future(3) },
+    { name: "product2", amount: 0, target: 150, targetDate: future(6) },
+    { name: "product3", amount: 0, target: 200, targetDate: future(9) },
+    { name: "product4", amount: 0, target: 250, targetDate: future(12) },
+    { name: "product5", amount: 0, target: 300, targetDate: future(15) },
   ];
 }
 
 function addProduct() {
-  let productName = document.getElementById("product-name").value;
-  let targetAmount = parseInt(document.getElementById("target-amount").value);
-  let targetDate = new Date(document.getElementById("target-date").value);
-  if (productName && targetAmount && targetDate) {
-    let newProduct = {
+  const productName = document.getElementById("product-name").value.trim();
+  const targetAmount = parseFloat(document.getElementById("target-amount").value);
+  const targetDateValue = document.getElementById("target-date").value;
+
+  if (productName && !isNaN(targetAmount) && targetDateValue) {
+    const newProduct = {
       name: productName,
       amount: 0,
       target: targetAmount,
-      targetDate: targetDate,
+      targetDate: targetDateValue, // Store as ISO string
     };
     piggybank.push(newProduct);
-    // Calculate monthsToTarget and monthlySavings for the new product
     calculateMonthsToTargetAndMonthlySavings(piggybank.length - 1);
     document.getElementById("product-name").value = "";
     document.getElementById("target-amount").value = "";
@@ -64,7 +69,7 @@ function addProduct() {
 }
 
 function removeProduct(index) {
-  let confirmation = confirm("Are you sure you want to remove this product?");
+  const confirmation = confirm("Are you sure you want to remove this product?");
   if (confirmation) {
     piggybank.splice(index, 1);
     displayPiggybank();
@@ -74,44 +79,28 @@ function removeProduct(index) {
 }
 
 function saveResults() {
-  try {
-    // Save to server
-    fetch("/api/save", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(piggybank),
+  fetch("/api/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(piggybank),
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Failed to save data");
+      alert("Piggy bank data saved successfully!");
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to save data");
-        }
-        alert("Piggy bank data saved successfully!");
-      })
-      .catch((error) => {
-        console.error("Error saving piggy bank data:", error);
-        alert(
-          "An error occurred while saving piggy bank data. Please try again later."
-        );
-      });
-  } catch (error) {
-    console.error("Error saving piggy bank data:", error);
-    alert(
-      "An error occurred while saving piggy bank data. Please try again later."
-    );
-  }
+    .catch((error) => {
+      console.error("Error saving piggy bank data:", error);
+      alert("An error occurred while saving piggy bank data. Please try again later.");
+    });
 }
 
-//backup
 document.getElementById("backup-data").addEventListener("click", function () {
   window.location.href = "/api/backup";
 });
 
 function changeTargetDate(item, value) {
-  let newDate = new Date(value);
-  if (newDate) {
-    piggybank[item].targetDate = newDate;
+  if (value) {
+    piggybank[item].targetDate = value; // Store as ISO string
     calculateMonthsToTargetAndMonthlySavings(item);
     displayPiggybank();
     updateDataTypeOptions();
@@ -120,9 +109,10 @@ function changeTargetDate(item, value) {
     alert("Invalid date");
   }
 }
+
 function changeAmountAndTarget(item, amount, targetAmount) {
-  const newAmount = parseInt(amount);
-  const newTargetAmount = parseInt(targetAmount);
+  const newAmount = parseFloat(amount);
+  const newTargetAmount = parseFloat(targetAmount);
   if (isNaN(newAmount) || isNaN(newTargetAmount)) {
     alert("Please enter valid amounts");
   } else {
@@ -134,20 +124,30 @@ function changeAmountAndTarget(item, amount, targetAmount) {
     displayChart();
   }
   document.getElementById("amount-" + item).value = piggybank[item].amount;
-  document.getElementById("target-amount-" + item).value =
-    piggybank[item].target;
+  document.getElementById("target-amount-" + item).value = piggybank[item].target;
 }
 
 function calculateMonthsToTargetAndMonthlySavings(item) {
   const targetDate = new Date(piggybank[item].targetDate);
   const currentDate = new Date();
-  piggybank[item].monthsToTarget = Math.round(
+  const monthsToTarget = Math.round(
     (targetDate - currentDate) / (1000 * 60 * 60 * 24 * 30)
   );
-  piggybank[item].monthlySavings = Math.round(
-    (piggybank[item].target - piggybank[item].amount) /
-      piggybank[item].monthsToTarget
-  );
+  piggybank[item].monthsToTarget = monthsToTarget;
+
+  // Guard against division by zero or negative months
+  if (monthsToTarget <= 0) {
+    piggybank[item].monthlySavings = piggybank[item].target - piggybank[item].amount;
+  } else {
+    piggybank[item].monthlySavings =
+      (piggybank[item].target - piggybank[item].amount) / monthsToTarget;
+  }
+}
+
+// Helper: format a number with the active currency symbol
+function formatCurrency(value) {
+  const symbol = currencySymbols[selectedCurrency] || " €";
+  return `<span class='currency-symbol'>${symbol}</span>${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function displayPiggybank() {
@@ -157,22 +157,20 @@ function displayPiggybank() {
   let totalMonthlySavings = 0;
 
   for (let item in piggybank) {
-    // Calculate totals
     totalAmountSaved += piggybank[item].amount;
     totalTargetAmount += piggybank[item].target;
     totalMonthlySavings += piggybank[item].monthlySavings;
 
-    // Calculate values for each item
     const targetDate = new Date(piggybank[item].targetDate);
     const monthsToTarget = piggybank[item].monthsToTarget;
     const monthlySavings = piggybank[item].monthlySavings;
+    const isPastDue = monthsToTarget <= 0;
 
-    // Build table row with template literals (without function calls in strings)
     tableData += `
-      <tr id="${item}">
-      <td><span id='product-name-${item}'>${piggybank[item].name}</span></td>
-      <td><span id='amount-${item}'>${piggybank[item].amount}</span></td>
-      <td><span id='target-amount-${item}'>${piggybank[item].target}</span></td>
+      <tr id="${item}" ${isPastDue ? "class='past-due'" : ""}>
+        <td><span id='product-name-${item}'>${piggybank[item].name}</span></td>
+        <td>${formatCurrency(piggybank[item].amount)}</td>
+        <td>${formatCurrency(piggybank[item].target)}</td>
         <td>${targetDate.toLocaleDateString("en-GB", {
           timeZone: "UTC",
           weekday: "long",
@@ -180,79 +178,73 @@ function displayPiggybank() {
           month: "short",
           day: "numeric",
         })}</td>
-        <td>${monthsToTarget}</td>
-        <td><span class='currency-symbol'>€ </span>${monthlySavings.toLocaleString()}</td>
+        <td>${isPastDue ? '<span title="Target date has passed">⚠ ' + monthsToTarget + "</span>" : monthsToTarget}</td>
+        <td>${formatCurrency(monthlySavings)}</td>
         <td>
           <button title="Move Up" id="move-up-${item}"><span class="iconify" data-icon="material-symbols:arrow-circle-up-outline-rounded"></span></button>
           <button title="Change Product Name" id="change-name-${item}"><span class="iconify" data-icon="material-symbols:edit"></span></button>
           <button title="Move Down" id="move-down-${item}"><span class="iconify" data-icon="material-symbols:arrow-circle-down-outline-rounded"></span></button>
-          <button title="Remove Item" id="remove-${item}"><span class="iconify" data-icon="material-symbols:delete-forever-outline"></span></button>      
-          </td>
+          <button title="Remove Item" id="remove-${item}"><span class="iconify" data-icon="material-symbols:delete-forever-outline"></span></button>
+        </td>
       </tr>
     `;
   }
 
-  // Add the footer row
-  const footerRow =
-    "<tr><td><strong>Total</strong></td><td><strong><span class='currency-symbol'>€ </span>" +
-    totalAmountSaved.toLocaleString() +
-    "</strong></td><td><strong><span class='currency-symbol'>€ </span>" +
-    totalTargetAmount.toLocaleString() +
-    "</strong></td><td></td><td></td><td><strong><span class='currency-symbol'>€ </span>" +
-    totalMonthlySavings.toLocaleString() +
-    "</strong></td><td></td></tr>";
+  const footerRow = `
+    <tr>
+      <td><strong>Total</strong></td>
+      <td><strong>${formatCurrency(totalAmountSaved)}</strong></td>
+      <td><strong>${formatCurrency(totalTargetAmount)}</strong></td>
+      <td></td><td></td>
+      <td><strong>${formatCurrency(totalMonthlySavings)}</strong></td>
+      <td></td>
+    </tr>`;
 
   document.getElementById("piggybank-table").innerHTML =
-    "<thead><tr><th>Product</th><th>Amount Saved<span class='currency-symbol'> €</span></th><th>Target Amount<span class='currency-symbol'> €</span></th><th>Target Date</th><th>Months to Target</th><th>Savings Allocation</th><th>Action</th></tr></thead><tbody>" +
-    tableData +
-    "</tbody><tfoot>" +
-    footerRow +
-    "</tfoot>";
+    `<thead><tr>
+      <th>Product</th>
+      <th>Amount Saved</th>
+      <th>Target Amount</th>
+      <th>Target Date</th>
+      <th>Months to Target</th>
+      <th>Savings Allocation</th>
+      <th>Action</th>
+    </tr></thead><tbody>${tableData}</tbody><tfoot>${footerRow}</tfoot>`;
 
-  // Add event listeners after building the table
+  // Attach event listeners — consistent pattern for both moveUp and moveDown
   for (let item in piggybank) {
-    const moveUpButton = document.getElementById(`move-up-${item}`);
-    moveUpButton.addEventListener("click", moveUp(item));
-    const moveDownButton = document.getElementById(`move-down-${item}`);
-    moveDownButton.dataset.item = item; // Store the item index in the element
-    moveDownButton.addEventListener("click", moveDown);
+    const idx = Number(item);
 
-    const changeNameButton = document.getElementById(`change-name-${item}`);
-    changeNameButton.addEventListener("click", function () {
-      currentItem = item; // Update the currentItem variable
-      productEdit(item);
+    document.getElementById(`move-up-${item}`).addEventListener("click", function () {
+      if (idx > 0) {
+        [piggybank[idx], piggybank[idx - 1]] = [piggybank[idx - 1], piggybank[idx]];
+        displayPiggybank();
+        updateDataTypeOptions();
+        displayChart();
+      }
     });
-    const removeButton = document.getElementById(`remove-${item}`);
-    removeButton.addEventListener("click", function () {
-      removeProduct(Number(item));
+
+    document.getElementById(`move-down-${item}`).addEventListener("click", function () {
+      if (idx < piggybank.length - 1) {
+        [piggybank[idx], piggybank[idx + 1]] = [piggybank[idx + 1], piggybank[idx]];
+        displayPiggybank();
+        updateDataTypeOptions();
+        displayChart();
+      }
+    });
+
+    document.getElementById(`change-name-${item}`).addEventListener("click", function () {
+      currentItem = idx;
+      productEdit(idx);
+    });
+
+    document.getElementById(`remove-${item}`).addEventListener("click", function () {
+      removeProduct(idx);
     });
   }
 }
 
-function moveUp(item) {
-  return function () {
-    if (item > 0) {
-      const temp = piggybank[item];
-      piggybank[item] = piggybank[item - 1];
-      piggybank[item - 1] = temp;
-      displayPiggybank();
-      updateDataTypeOptions();
-      displayChart();
-    }
-  };
-}
-function moveDown(event) {
-  const item = Number(event.currentTarget.dataset.item); // Retrieve the item index from the element
-  if (item < piggybank.length - 1) {
-    const temp = piggybank[item];
-    piggybank[item] = piggybank[item + 1];
-    piggybank[item + 1] = temp;
-    displayPiggybank();
-    updateDataTypeOptions();
-    displayChart();
-  }
-}
-
+// ── Popup ────────────────────────────────────────────────────────────────────
 const popupDiv = document.createElement("div");
 popupDiv.id = "change-name-popup";
 popupDiv.style.display = "none";
@@ -276,65 +268,48 @@ const popup = document.getElementById("change-name-popup");
 const newProductNameInput = document.getElementById("new-product-name");
 
 function productEdit(item) {
-  const productNameSpan = document.getElementById(`product-name-${item}`);
-  newProductNameInput.value = productNameSpan.textContent; // Set current name as default value in input field
-  const newAmountSavedInput = document.getElementById("new-amount-saved");
-  newAmountSavedInput.value = piggybank[item].amount; // Set current amount saved as default value in input field
-  const newTargetAmountInput = document.getElementById("new-target-amount");
-  newTargetAmountInput.value = piggybank[item].target; // Set current target amount as default value in input field
-  const newTargetDateInput = document.getElementById("new-target-date");
-  newTargetDateInput.value = piggybank[item].targetDate; // Set current target date as default value in input field
-  if (popup.style.display === "none") {
-    popup.style.display = "block";
-  } else {
-    popup.style.display = "none";
-  }
+  newProductNameInput.value = piggybank[item].name;
+  document.getElementById("new-amount-saved").value = piggybank[item].amount;
+  document.getElementById("new-target-amount").value = piggybank[item].target;
+  // targetDate is always an ISO string now, safe to set directly
+  document.getElementById("new-target-date").value =
+    typeof piggybank[item].targetDate === "string"
+      ? piggybank[item].targetDate.split("T")[0]
+      : new Date(piggybank[item].targetDate).toISOString().split("T")[0];
+
+  popup.style.display = popup.style.display === "none" ? "block" : "none";
 }
 
-// Display the piggy bank when the page loads
-displayPiggybank();
-
-// Add event listeners to buttons
 document.getElementById("add-product").addEventListener("click", addProduct);
 document.getElementById("save-results").addEventListener("click", saveResults);
 
-const confirmButton = document.getElementById("confirm-change");
-confirmButton.addEventListener("click", function () {
-  const newItemName = document.getElementById("new-product-name").value;
-  const newAmountSaved = parseInt(
-    document.getElementById("new-amount-saved").value
-  );
-  const newTargetAmount = parseInt(
-    document.getElementById("new-target-amount").value
-  );
-  let newTargetDateInput = document.getElementById("new-target-date");
-  let newTargetDate = newTargetDateInput.value
-    ? new Date(newTargetDateInput.value)
-    : piggybank[currentItem].targetDate;
-  if (
-    newItemName.trim() !== "" &&
-    !isNaN(newAmountSaved) &&
-    !isNaN(newTargetAmount) &&
-    newTargetDate
-  ) {
+document.getElementById("confirm-change").addEventListener("click", function () {
+  const newItemName = document.getElementById("new-product-name").value.trim();
+  const newAmountSaved = parseFloat(document.getElementById("new-amount-saved").value);
+  const newTargetAmount = parseFloat(document.getElementById("new-target-amount").value);
+  const newTargetDateValue = document.getElementById("new-target-date").value;
+  const newTargetDate = newTargetDateValue || piggybank[currentItem].targetDate;
+
+  if (newItemName !== "" && !isNaN(newAmountSaved) && !isNaN(newTargetAmount) && newTargetDate) {
     piggybank[currentItem].name = newItemName;
     piggybank[currentItem].amount = newAmountSaved;
     piggybank[currentItem].target = newTargetAmount;
-    piggybank[currentItem].targetDate = newTargetDate;
-    calculateMonthsToTargetAndMonthlySavings(currentItem); // Add this line
+    piggybank[currentItem].targetDate = newTargetDate; // ISO string
+    calculateMonthsToTargetAndMonthlySavings(currentItem);
     productEdit(currentItem);
     displayPiggybank();
+    updateDataTypeOptions();
+    displayChart();
   } else {
     alert("Please enter valid values.");
   }
 });
 
-// Add event listener for the cancel button
-const cancelButton = document.getElementById("cancel-change");
-cancelButton.addEventListener("click", function () {
-  productEdit(currentItem); // Use currentItem instead of item
+document.getElementById("cancel-change").addEventListener("click", function () {
+  productEdit(currentItem);
 });
 
+// ── Currency ─────────────────────────────────────────────────────────────────
 const currencySymbols = {
   USD: " $",
   EUR: " €",
@@ -349,18 +324,12 @@ const currencySymbols = {
 };
 
 function changeCurrency() {
-  const currencySelector = document.getElementById("currency-selector");
-  const currencySymbolElements = document.querySelectorAll(".currency-symbol");
-
-  // Now just reference the constant object
-  for (let i = 0; i < currencySymbolElements.length; i++) {
-    const currency = currencySelector.value;
-    const currencySymbol = currencySymbols[currency];
-    currencySymbolElements[i].textContent = currencySymbol;
-  }
+  selectedCurrency = document.getElementById("currency-selector").value;
+  // Re-render the table so all currency symbols update correctly
+  displayPiggybank();
 }
 
-//Chart code:
+// ── Chart ─────────────────────────────────────────────────────────────────────
 let chart;
 const CHART_COLORS = {
   backgroundColor: [
@@ -386,41 +355,26 @@ const CHART_COLORS = {
 const CHART_OPTIONS = {
   responsive: true,
   maintainAspectRatio: true,
-  animation: {
-    duration: 250, // Faster animations
-  },
+  animation: { duration: 250 },
   scales: {
     y: {
       beginAtZero: true,
       ticks: {
         color: "#ACACAC",
-        callback: (value) => value.toLocaleString(), // Format large numbers
+        callback: (value) => value.toLocaleString(),
       },
     },
-    x: {
-      ticks: {
-        color: "#ACACAC",
-      },
-    },
+    x: { ticks: { color: "#ACACAC" } },
   },
   plugins: {
     zoom: {
       zoom: {
-        wheel: {
-          enabled: true,
-          mode: "y",
-        },
-        pinch: {
-          enabled: true,
-        },
+        wheel: { enabled: true, mode: "y" },
+        pinch: { enabled: true },
         mode: "y",
-        drag: {
-          enabled: true,
-        },
+        drag: { enabled: true },
       },
-      limits: {
-        y: { min: 0, max: 35000 },
-      },
+      limits: { y: { min: 0, max: 35000 } },
     },
   },
 };
@@ -447,7 +401,7 @@ function getChartData(dataType) {
           },
         ],
       };
-    case "history":
+    case "history": {
       const dates = [
         ...new Set(
           piggybank.flatMap((item) =>
@@ -462,19 +416,18 @@ function getChartData(dataType) {
           {
             label: `${item.name} - Amount`,
             data: dates.map((date) => {
-              const historyEntry = item.history?.find((h) => h.date === date);
-              return historyEntry ? historyEntry.amount : null;
+              const h = item.history?.find((h) => h.date === date);
+              return h ? h.amount : null;
             }),
             borderColor: CHART_COLORS.borderColor[piggybank.indexOf(item)],
-            backgroundColor:
-              CHART_COLORS.backgroundColor[piggybank.indexOf(item)],
+            backgroundColor: CHART_COLORS.backgroundColor[piggybank.indexOf(item)],
             fill: false,
           },
           {
             label: `${item.name} - Target`,
             data: dates.map((date) => {
-              const historyEntry = item.history?.find((h) => h.date === date);
-              return historyEntry ? historyEntry.target : null;
+              const h = item.history?.find((h) => h.date === date);
+              return h ? h.target : null;
             }),
             borderColor: CHART_COLORS.borderColor[piggybank.indexOf(item)],
             backgroundColor: "transparent",
@@ -483,12 +436,11 @@ function getChartData(dataType) {
           },
         ]),
       };
+    }
     default:
-      // Handle individual goal history
       if (dataType.startsWith("goal_")) {
         const goalName = dataType.replace("goal_", "");
         const goal = piggybank.find((item) => item.name === goalName);
-
         if (!goal || !goal.history) return null;
 
         const dates = goal.history.map((h) => h.date).sort();
@@ -498,8 +450,8 @@ function getChartData(dataType) {
             {
               label: `${goal.name} - Amount`,
               data: dates.map((date) => {
-                const historyEntry = goal.history.find((h) => h.date === date);
-                return historyEntry ? historyEntry.amount : null;
+                const h = goal.history.find((h) => h.date === date);
+                return h ? h.amount : null;
               }),
               borderColor: CHART_COLORS.borderColor[0],
               backgroundColor: CHART_COLORS.backgroundColor[0],
@@ -508,8 +460,8 @@ function getChartData(dataType) {
             {
               label: `${goal.name} - Target`,
               data: dates.map((date) => {
-                const historyEntry = goal.history.find((h) => h.date === date);
-                return historyEntry ? historyEntry.target : null;
+                const h = goal.history.find((h) => h.date === date);
+                return h ? h.target : null;
               }),
               borderColor: CHART_COLORS.borderColor[0],
               backgroundColor: "transparent",
@@ -525,19 +477,16 @@ function getChartData(dataType) {
 
 function displayChart(dataType = "savings", chartType = "bar") {
   const ctx = document.getElementById("piggybank-chart").getContext("2d");
-
   const chartData = getChartData(dataType);
   if (!chartData) return;
 
   if (chart) {
-    // Update existing chart
     chart.data = chartData;
     chart.config.type = chartType;
     chart.update("none");
     return;
   }
 
-  // Create new chart if it doesn't exist
   chart = new Chart(ctx, {
     type: chartType,
     data: chartData,
@@ -545,29 +494,22 @@ function displayChart(dataType = "savings", chartType = "bar") {
   });
 }
 
-// Add a function to switch data/chart type
 function switchChartView(dataType, chartType) {
   displayChart(dataType, chartType);
 }
 
-// Function to update data type options
 function updateDataTypeOptions() {
   const dataTypeSelect = document.getElementById("dataType");
   const currentValue = dataTypeSelect.value;
 
-  // Clear existing options
   dataTypeSelect.innerHTML = "";
-
-  // Add default options
   dataTypeSelect.add(new Option("Savings", "savings"));
   dataTypeSelect.add(new Option("All Goals History", "history"));
 
-  // Add individual goals
   piggybank.forEach((item) => {
     dataTypeSelect.add(new Option(`${item.name}`, `goal_${item.name}`));
   });
 
-  // Try to restore previous selection
   if (dataTypeSelect.querySelector(`option[value="${currentValue}"]`)) {
     dataTypeSelect.value = currentValue;
   }

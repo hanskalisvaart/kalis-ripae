@@ -1,46 +1,64 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Kalis-ripae</title>
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="icon" type="image/x-icon" href="favicon.svg" />
-    <script src="script/chart.min.js"></script>
-    <script src="script/chartjs-plugin-zoom.min.js" type="module"></script>
-    <script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
-  </head>
-  <body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalis-ripae</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" type="image/x-icon" href="favicon.svg" />
+  <!-- Both Chart.js and its zoom plugin loaded as classic scripts (consistent) -->
+  <script src="script/chart.min.js"></script>
+  <script src="script/chartjs-plugin-zoom.min.js"></script>
+  <script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
+</head>
+<body>
+  <header>
     <h1>Kalis ripae</h1>
-    <div class="piggybank">
-      <div>
-        <label for="product-name">Product Name:</label>
-        <input type="text" id="product-name" />
-        <label for="target-amount">Target Amount:</label>
-        <input type="number" id="target-amount" />
-        <label for="target-date">Target Date:</label>
-        <input type="date" id="target-date" />
-        <button id="add-product">Add Product</button>
-      </div>
+  </header>
 
-      <br />
+  <main>
+    <section class="piggybank" aria-label="Savings goals">
 
-      <table id="piggybank-table">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Amount Saved</th>
-            <th>Target Amount</th>
-            <th>Target Date</th>
-            <th>Months to Target</th>
-            <th>Monthly Savings</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <!-- Add product form -->
+      <section aria-label="Add a new savings goal">
+        <div class="add-product-form">
+          <label for="product-name">Product Name:</label>
+          <input type="text" id="product-name" required autocomplete="off" />
 
-      <div>
-        <button id="save-results">Save Results</button>
-        <button id="backup-data">Backup</button>
+          <label for="target-amount">Target Amount:</label>
+          <input type="number" id="target-amount" min="0" step="0.01" required />
+
+          <label for="target-date">Target Date:</label>
+          <input type="date" id="target-date" required />
+
+          <button id="add-product" type="button">Add Product</button>
+        </div>
+      </section>
+
+      <!-- Savings table -->
+      <section aria-label="Savings overview">
+        <table id="piggybank-table">
+          <thead>
+            <tr>
+              <th scope="col">Product</th>
+              <th scope="col">Amount Saved</th>
+              <th scope="col">Target Amount</th>
+              <th scope="col">Target Date</th>
+              <th scope="col">Months to Target</th>
+              <th scope="col">Savings Allocation</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <!-- Controls -->
+      <section class="controls" aria-label="Data controls">
+        <button id="save-results" type="button">Save Results</button>
+        <button id="backup-data" type="button">Backup</button>
+
+        <label for="currency-selector">Currency:</label>
         <select id="currency-selector" onchange="changeCurrency()">
           <option value="EUR">EUR</option>
           <option value="USD">USD</option>
@@ -53,6 +71,8 @@
           <option value="HKD">HKD</option>
           <option value="NZD">NZD</option>
         </select>
+
+        <label for="chartType">Chart type:</label>
         <select
           id="chartType"
           onchange="switchChartView(document.getElementById('dataType').value, this.value)"
@@ -61,17 +81,24 @@
           <option value="line">Line Chart</option>
         </select>
 
+        <label for="dataType">Data view:</label>
         <select
           id="dataType"
           onchange="switchChartView(this.value, document.getElementById('chartType').value)"
         >
           <option value="savings">Savings</option>
           <option value="history">Historical View</option>
-          <!-- Add other data type options as needed -->
         </select>
-      </div>
-      <div class="canvas"><canvas id="piggybank-chart"></canvas></div>
-    </div>
-    <script src="script/script.js"></script>
-  </body>
+      </section>
+
+      <!-- Chart -->
+      <section class="canvas" aria-label="Savings chart">
+        <canvas id="piggybank-chart"></canvas>
+      </section>
+
+    </section>
+  </main>
+
+  <script src="script/script.js"></script>
+</body>
 </html>
