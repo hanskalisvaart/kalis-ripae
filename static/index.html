@@ -6,7 +6,6 @@
   <title>Kalis-ripae</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="icon" type="image/x-icon" href="favicon.svg" />
-  <!-- Both Chart.js and its zoom plugin loaded as classic scripts (consistent) -->
   <script src="script/chart.min.js"></script>
   <script src="script/chartjs-plugin-zoom.min.js"></script>
   <script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
@@ -19,7 +18,7 @@
   <main>
     <section class="piggybank" aria-label="Savings goals">
 
-      <!-- Add product form -->
+      <!-- Add product -->
       <section aria-label="Add a new savings goal">
         <div class="add-product-form">
           <label for="product-name">Product Name:</label>
@@ -35,22 +34,25 @@
         </div>
       </section>
 
-      <!-- Savings table -->
+      <!-- Savings table — wrapped for horizontal scroll on small screens -->
       <section aria-label="Savings overview">
-        <table id="piggybank-table">
-          <thead>
-            <tr>
-              <th scope="col">Product</th>
-              <th scope="col">Amount Saved</th>
-              <th scope="col">Target Amount</th>
-              <th scope="col">Target Date</th>
-              <th scope="col">Months to Target</th>
-              <th scope="col">Savings Allocation</th>
-              <th scope="col">Action</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-scroll">
+          <table id="piggybank-table">
+            <thead>
+              <tr>
+                <th scope="col">Product</th>
+                <th scope="col">Amount Saved</th>
+                <th scope="col">Target</th>
+                <th scope="col">Remaining</th>
+                <th scope="col">Target Date</th>
+                <th scope="col">Months Left</th>
+                <th scope="col">Monthly Allocation</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </section>
 
       <!-- Controls -->
@@ -73,19 +75,13 @@
         </select>
 
         <label for="chartType">Chart type:</label>
-        <select
-          id="chartType"
-          onchange="switchChartView(document.getElementById('dataType').value, this.value)"
-        >
+        <select id="chartType" onchange="switchChartView(document.getElementById('dataType').value, this.value)">
           <option value="bar">Bar Chart</option>
           <option value="line">Line Chart</option>
         </select>
 
         <label for="dataType">Data view:</label>
-        <select
-          id="dataType"
-          onchange="switchChartView(this.value, document.getElementById('chartType').value)"
-        >
+        <select id="dataType" onchange="switchChartView(this.value, document.getElementById('chartType').value)">
           <option value="savings">Savings</option>
           <option value="history">Historical View</option>
         </select>

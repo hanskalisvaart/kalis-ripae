@@ -1,4 +1,6 @@
-/* Body Styles */
+/* ── Reset & base ────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
   font-family: Arial, sans-serif;
   background-color: #2c3446;
@@ -6,7 +8,7 @@ body {
   padding: 0;
 }
 
-/* Header Styles */
+/* ── Header ──────────────────────────────────────────────────────────────────── */
 h1 {
   text-align: center;
   font-size: 3rem;
@@ -14,39 +16,49 @@ h1 {
   margin: 2rem 0;
 }
 
+/* ── Layout wrapper ──────────────────────────────────────────────────────────── */
 .piggybank {
   margin: auto;
-  max-width: 1024px;
+  max-width: 1200px;
+  padding: 0 1rem;
 }
 
-/* Form Styles */
-form {
+/* ── Add-product form area ───────────────────────────────────────────────────── */
+.add-product-form {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
   align-items: center;
   padding: 1rem;
-  background-color: #fff;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  background-color: #1f2739;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
   border-radius: 5px;
   margin-bottom: 1rem;
 }
 
-label {
-  font-size: 1.2rem;
+.add-product-form label {
+  font-size: 1rem;
   font-weight: bold;
   color: #2896c9;
+  white-space: nowrap;
 }
 
-input {
-  padding: 0.5rem;
-  font-size: 1.2rem;
+.add-product-form input {
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
   border: none;
   border-radius: 3px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  width: 100px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  width: 130px;
+  background: #2c3446;
+  color: #acacac;
 }
 
+.add-product-form button {
+  margin-left: auto;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────────── */
 button {
   background-color: #833;
   color: #fff;
@@ -57,96 +69,86 @@ button {
   font-size: 1.2rem;
   cursor: pointer;
 }
+button:hover { background-color: #411; }
 
-button:hover {
-  background-color: #411;
+/* ── Controls bar ────────────────────────────────────────────────────────────── */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 1rem 0;
 }
 
+.controls label {
+  font-size: 0.9rem;
+  color: #2896c9;
+  font-weight: bold;
+}
+
+.controls select {
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid #464a52;
+  background: #1f2739;
+  color: #acacac;
+  font-size: 0.95rem;
+}
+
+/* ── Canvas ──────────────────────────────────────────────────────────────────── */
 .canvas {
   background-color: #323c50;
-  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
   margin: 25px auto;
+  padding: 1rem;
+  border-radius: 5px;
+  overflow-x: auto;
 }
 
-/* Table Styles */
+/* ── Table wrapper (enables horizontal scroll on small screens) ──────────────── */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 25px 0;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+/* ── Table ───────────────────────────────────────────────────────────────────── */
 table {
   width: 100%;
   border-collapse: collapse;
   background-color: #fff;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-  margin: 25px auto;
+  min-width: 700px; /* prevents columns collapsing too small */
 }
 
-thead {
-  background-color: #1f2739;
-  color: #fff;
-}
+thead { background-color: #1f2739; color: #fff; }
 
 th {
   font-weight: bold;
-  font-size: 1em;
+  font-size: 0.95em;
   text-align: left;
   color: #2896c9;
-  padding: 1em;
-}
-
-th:first-child {
-  text-align: left;
+  padding: 0.8em 1em;
+  white-space: nowrap;
 }
 
 td {
-  font-weight: normal;
-  font-size: 1em;
-  -webkit-box-shadow: 0 2px 2px -2px #0e1119;
-  -moz-box-shadow: 0 2px 2px -2px #0e1119;
+  font-size: 0.95em;
   box-shadow: 0 2px 2px -2px #0e1119;
-  padding: 0px 20px;
+  padding: 6px 14px;
   font-weight: bold;
   color: #acacac;
+  vertical-align: middle;
 }
 
-td:first-child {
-  color: #ffa600;
-}
+td:first-child { color: #ffa600; }
 
-/* Background-color of the odd rows */
-tbody tr:nth-child(odd) {
-  background-color: #2c3446;
-}
-
-/* Background-color of the even rows */
-tbody tr:nth-child(even) {
-  background-color: #323c50;
-}
-
-tfoot {
-  background-color: #1f2739;
-  color: #fff;
-}
-
-tfoot td {
-  padding: 1em;
-  text-align: center;
-}
-
-tfoot td:first-child {
-  text-align: left;
-  color: #2896c9;
-}
-
-tfoot td:hover {
-  background-color: #1f2739;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  color: #fff;
-  transform: translate3d(0px, 0px, 0);
-}
+tbody tr:nth-child(odd)  { background-color: #2c3446; }
+tbody tr:nth-child(even) { background-color: #323c50; }
 
 tbody tr:hover {
   background-color: #464a52;
-  -webkit-box-shadow: 0 6px 6px -6px #0e1119;
-  -moz-box-shadow: 0 6px 6px -6px #0e1119;
   box-shadow: 0 6px 6px -6px #0e1119;
 }
 
@@ -155,34 +157,86 @@ td:hover {
   color: #403e10;
   font-weight: bold;
   box-shadow: #7f5921 -1px 1px, #7f5921 -2px 2px, #7f5921 -3px 3px,
-    #7f5921 -4px 4px, #7f5921 -5px 5px, #7f5921 -6px 6px;
+              #7f5921 -4px 4px, #7f5921 -5px 5px, #7f5921 -6px 6px;
   transform: translate3d(3px, -3px, 0);
-  transition-delay: 0s;
-  transition-duration: 0.8s;
-  transition-property: all;
-  transition-timing-function: line;
+  transition: all 0.8s;
 }
 
-/* Save Results Button Styles */
-.save-results {
-  text-align: center;
-  margin-top: 1rem;
+/* Keep name cell stable during hover so progress bar isn't affected */
+td.td-name:hover {
+  transform: none;
+  box-shadow: none;
+  background-color: inherit;
+  color: #ffa600;
 }
 
-.save-results button {
-  background-color: #333;
+tfoot { background-color: #1f2739; color: #fff; }
+tfoot td { padding: 0.8em 1em; }
+tfoot td:first-child { color: #2896c9; }
+tfoot td:hover {
+  background-color: #1f2739;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
   color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 3px;
-  font-size: 1.2rem;
-  cursor: pointer;
+  transform: none;
 }
 
-.save-results button:hover {
-  background-color: #666;
+/* ── Progress bar ────────────────────────────────────────────────────────────── */
+.progress-wrap {
+  width: 100%;
+  background: #1a2030;
+  border-radius: 4px;
+  height: 10px;
+  margin-top: 5px;
+  overflow: hidden;
+  min-width: 80px;
 }
 
+.progress-bar {
+  height: 100%;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.progress-label {
+  font-size: 0.6rem;
+  color: #fff;
+  font-weight: bold;
+  padding-right: 3px;
+  white-space: nowrap;
+  text-shadow: 0 0 3px rgba(0,0,0,0.6);
+}
+
+/* ── Completion / overdue badges ─────────────────────────────────────────────── */
+.badge-complete {
+  background: #2896c9;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.badge-overdue {
+  background: #833;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* ── Complete row styling ────────────────────────────────────────────────────── */
+tr.goal-complete td { opacity: 0.6; }
+tr.goal-complete td:first-child { color: #2896c9; }
+
+/* ── Past-due row ────────────────────────────────────────────────────────────── */
+tr.past-due td:first-child { color: #c93838; }
+
+/* ── Edit popup ──────────────────────────────────────────────────────────────── */
 #change-name-popup {
   outline: 7px double #833;
   position: fixed;
@@ -193,15 +247,129 @@ td:hover {
   padding: 10px 20px;
   border: 1px solid #833;
   border-radius: 5px;
+  z-index: 1000;
+  width: min(90vw, 380px);
 }
 
-.chart-controls {
-  margin: 20px 0;
-  text-align: right;
+#popup-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
-.chart-controls select {
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+#popup-content label {
+  color: #2896c9;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+#popup-content input {
+  padding: 0.4rem 0.6rem;
+  border-radius: 3px;
+  border: none;
+  background: #1f2739;
+  color: #acacac;
+  font-size: 1rem;
+  width: 100%;
+}
+
+/* ── Responsive: tablet (≤ 900px) ───────────────────────────────────────────── */
+@media (max-width: 900px) {
+  h1 { font-size: 2rem; }
+
+  .piggybank { padding: 0 0.75rem; }
+
+  .add-product-form { gap: 0.4rem 0.75rem; }
+  .add-product-form input { width: 110px; }
+}
+
+/* ── Responsive: mobile (≤ 600px) ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  h1 { font-size: 1.6rem; margin: 1rem 0; }
+
+  .piggybank { padding: 0 0.5rem; }
+
+  /* Stack add-product form vertically */
+  .add-product-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .add-product-form input { width: 100%; }
+  .add-product-form button { width: 100%; padding: 0.5rem; }
+
+  /* Stack controls */
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .controls select,
+  .controls button { width: 100%; }
+
+  /* On mobile, switch table to card layout */
+  .table-scroll { overflow-x: unset; }
+
+  table, thead, tbody, tfoot, th, td, tr { display: block; }
+  table { min-width: unset; box-shadow: none; }
+
+  thead { display: none; } /* Hide column headers — replaced by data-label */
+
+  tbody tr {
+    background-color: #2c3446;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  tbody tr:nth-child(even) { background-color: #2c3446; }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.35rem 0.25rem;
+    border-bottom: 1px solid #1f2739;
+    box-shadow: none;
+    transform: none !important; /* disable 3D hover on mobile */
+  }
+  td:last-child { border-bottom: none; }
+
+  /* Show the column label before each value */
+  td[data-label]::before {
+    content: attr(data-label);
+    color: #2896c9;
+    font-size: 0.8rem;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-right: 0.5rem;
+  }
+
+  /* Name cell: stack name + progress bar vertically */
+  td.td-name {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  td.td-name::before { content: none; }
+
+  .progress-wrap { width: 100%; margin-top: 6px; }
+
+  /* Actions: spread buttons out */
+  td.td-actions {
+    justify-content: flex-end;
+    gap: 0.25rem;
+  }
+
+  /* Footer as simple stacked rows */
+  tfoot tr {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: #1f2739;
+    border-radius: 6px;
+  }
+  tfoot td {
+    border: none;
+    padding: 0.2rem 0.5rem;
+    flex: 1 1 40%;
+  }
 }
